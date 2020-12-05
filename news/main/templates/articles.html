@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class = "container-fluid">
+<div class = "row">
+<h1>{{article.title}}</h1>
+</div>
+
+<div class = "row">
+<p1>{{article.writing}}</p1>
+</div>
+
+<div class = "row">
+<button id="like">like</button>
+</div>
+
+<div class = "row">
+  <p1 id = "likenum" ></p1>
+</div>
+</div>
+{% endblock content %}
+
+
+{% block javascript %}
+<script>
+
+function getLikes(){
+$.ajax({
+    type: 'GET',
+    url: "{% url 'get_like' %}",
+    data: {},
+    success: function (response) {
+      likes = response['likes']
+      $("#likenum").text(likes)
+
+    }
+});
+}
+
+$(document).ready(function (r) {
+
+
+  getLikes();
+
+  $("#like").click(function(){
+    console.log("liked");
+    $.ajax({
+        type: 'POST',
+        url: "{% url 'groot_like' %}",
+        data: {csrfmiddlewaretoken: '{{ csrf_token }}'},
+        success: function (response) {
+          console.log("I am here")
+          getLikes();
+    }
+  });
+})
+})
+
+</script>
+{% endblock javascript %}

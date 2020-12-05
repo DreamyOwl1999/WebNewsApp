@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+  <select id="sel">
+      <option value="">-- Select --</option>
+  </select>
+  </div>
+  <div class="row">
+    <ul id = 'artlicleList'>
+  </ul>
+  </div>
+</div>
+
+
+{% endblock content %}
+
+
+
+
+
+{% block javascript %}
+<script>
+$(document).ready(function (r) {
+  $.ajax({
+    type: 'GET',
+    url: "{% url 'title_load_get' %}",
+    success: function (response) {
+      choices = response['choices']
+      console.log(choices)
+      var word = "";
+      for (var i = 0; i < choices.length; i++)
+      {
+        choice = choices[i];
+        if (!choice.localeCompare(",")){
+        $('#sel').append('<option value="'+ word  + '">' +  word  + '</option>');
+        word = "";
+      }
+      else{
+        console.log(choice)
+        word = word + choice;
+      }
+      }
+  }
+}) ;
+
+$('#sel').change(function () {
+
+  var a = $('#sel').val();
+  console.log(a);
+
+  $.ajax({
+    type: 'POST',
+    url: "{% url 'post_articles' %}",
+    data: {csrfmiddlewaretoken: '{{ csrf_token }}', choice:a},
+    success: function (response) {
+      console.log("choice thrown back");
+      $.ajax({
+        type: 'GET',
+        url: "{% url 'get_articles' %}",
+        data: { },
+        success: function (response) {
+          console.log("I entered get");
+          instance = JSON.parse(response["articles"]);
+          console.log(response)
+          for (var i = 0; i < instance.length; i++)
+          {
+            id = instance[i]["pk"];
+            console.log(id);
+            $("#artlicleList").append('<li><a href= \"/groot/' + id +' \">' +
+              instance[i]["fields"]["title"]+'</a></li>');
+          }
+
+        }
+      })
+    }
+  })
+
+});
+});
+</script>
+{% endblock javascript %}

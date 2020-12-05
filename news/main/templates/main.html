@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="row">
+    Username:
+    {{name}}
+    </div>
+
+    <form id="choices">
+          {% csrf_token %}
+            {% for field in form %}
+            <div class="row">
+                {{ field|as_crispy_field }}
+            </div>
+            {% endfor %}
+            <input  type="submit" class="btn btn-primary"> </input>
+
+
+    </form>
+</div>
+
+{% endblock content %}
+
+{% block javascript %}
+<script>
+
+    $("#choices").submit(function (e) {
+      e.preventDefault();
+      var serializedData = $(this).serialize();
+      $.ajax({
+          type: 'POST',
+          url: "{% url 'post_newsSection' %}",
+          data: serializedData,
+          success: function (response) {
+            console.log("I am here")
+          }
+      });
+    });
+ </script>
+{% endblock javascript %}
